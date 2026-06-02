@@ -10,6 +10,8 @@ import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class AuthService {
+  private readonly SALT_ROUNDS = 10;
+
   constructor(
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
@@ -21,7 +23,7 @@ export class AuthService {
     });
     if (exists) throw new ConflictException('Email already in use');
 
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const hashedPassword = await bcrypt.hash(dto.password, this.SALT_ROUNDS);
 
     const user = await this.prisma.user.create({
       data: { email: dto.email, name: dto.name, password: hashedPassword },
@@ -35,12 +37,12 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
-    if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    const valid = await bcrypt.compare(dto.password, user.password);
-    if (!valid) throw new UnauthorizedException('Invalid credentials');
+    if (!user || !(await bcrypt.compare(dto.password, user.password))) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
-    const { password: _, ...safeUser } = user;
+    const { password: _pw, ...safeUser } = user;
     return { user: safeUser, token: this.signToken(user.id, user.email) };
   }
 

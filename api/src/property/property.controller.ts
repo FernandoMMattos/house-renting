@@ -9,12 +9,16 @@ import {
   Get,
   Delete,
   Patch,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { PropertyService } from './property.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { PropertyDto } from './dto/property.dto.js';
-import { FindPropertiesQueryDto } from './dto/find-property-by-area-code.dto.js';
+import { FindPropertiesQueryDto } from './dto/find-properties-query.dto.js';
 import { UpdatePropertyDto } from './dto/update-property.dto.js';
+import { CurrentUser } from '../common/decorators/current-user.decorator.js';
+import type { JwtUser } from '../common/types/jwt-user.decorator.js';
 
 @Controller('properties')
 export class PropertyController {
@@ -22,8 +26,9 @@ export class PropertyController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Request() req, @Body() dto: PropertyDto) {
-    return this.propertyService.create(req.user.id, dto);
+  @HttpCode(HttpStatus.CREATED)
+  create(@CurrentUser() user: JwtUser, @Body() dto: PropertyDto) {
+    return this.propertyService.create(user.id, dto);
   }
 
   @Get()
@@ -31,10 +36,11 @@ export class PropertyController {
     return this.propertyService.findAll(query);
   }
 
+  // NOTE: 'me' must stay above ':id' to avoid being matched as a param
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  findMine(@Request() req) {
-    return this.propertyService.findByAuthor(req.user.id);
+  findMine(@CurrentUser() user: JwtUser) {
+    return this.propertyService.findByAuthor(user.id);
   }
 
   @Get(':id')
@@ -44,12 +50,17 @@ export class PropertyController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdatePropertyDto) {
-    return (this, this.propertyService.update(id, dto));
+  update(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtUser,
+    @Body() dto: UpdatePropertyDto,
+  ) {
+    return this.propertyService.update(user.id, id, dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.propertyService.delete(id);
+  remove(@Param('id') id: string, @CurrentUser() user: JwtUser) {
+    return this.propertyService.delete(user.id, id);
   }
 }

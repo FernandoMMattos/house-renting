@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { PrismaService } from '../prisma/prisma.service.js';
 import * as streamifier from 'streamifier';
@@ -10,7 +15,7 @@ export class UploadService {
   private uploadToCloudinary(
     file: Express.Multer.File,
   ): Promise<UploadApiResponse> {
-    return new Promise((res, rej) => {
+    return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: 'rental_houses',
@@ -19,36 +24,60 @@ export class UploadService {
           transformation: [{ width: 2560, height: 1440, crop: 'limit' }],
         },
         (error, result) => {
-          if (error) return rej(error);
-          if (!result) return rej(new Error('Cloudinary returned no result'));
-          res(result);
+          if (error) return reject(error);
+          if (!result)
+            return reject(new Error('Cloudinary returned no result'));
+          resolve(result);
         },
       );
       streamifier.createReadStream(file.buffer).pipe(uploadStream);
     });
   }
 
-  async uploadImages(files: Express.Multer.File[], houseId: string) {
+  async uploadImages(
+    files: Express.Multer.File[],
+    propertyId: string,
+    requesterId: string,
+  ) {
+    const property = await this.prisma.property.findUnique({
+      where: { id: propertyId },
+    });
+    if (!property) throw new NotFoundException('Property not found');
+    if (property.authorId !== requesterId)
+      throw new ForbiddenException('You do not own this property');
+
     const cloudinaryResults = await Promise.all(
       files.map((file) => this.uploadToCloudinary(file)),
     );
 
-    const saved = await Promise.all(
-      cloudinaryResults.map((result) =>
-        this.prisma.image.create({
-          data: {
-            url: result.secure_url,
-            publicId: result.public_id,
-            houseId,
-          },
-        }),
-      ),
-    );
-
-    return saved;
+    try {
+      return await this.prisma.image.createMany({
+        data: cloudinaryResults.map((result) => ({
+          url: result.secure_url,
+          publicId: result.public_id,
+          propertyId,
+        })),
+      });
+    } catch (error) {
+      await Promise.allSettled(
+        cloudinaryResults.map((r) => cloudinary.uploader.destroy(r.public_id)),
+      );
+      throw new InternalServerErrorException('Failed to save images');
+    }
   }
 
-  async deleteImage(publicId: string): Promise<void> {
-    await cloudinary.uploader.destroy(publicId);
+  async deleteImage(imageId: string, requesterId: string): Promise<void> {
+    const image = await this.prisma.image.findUnique({
+      where: { id: imageId },
+      include: { property: { select: { authorId: true } } },
+    });
+
+    if (!image) throw new NotFoundException('Image not found');
+
+    if (image.property.authorId !== requesterId)
+      throw new ForbiddenException("You don't own this image");
+
+    await cloudinary.uploader.destroy(image.publicId);
+    await this.prisma.image.delete({ where: { id: imageId } });
   }
 }

@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { UploadService } from './upload.service.js';
-import { PrismaService } from '../prisma/prisma.service.js';
-import { UploadController } from './upload.controller.js';
-import { CloudinaryProvider } from '../../cloudinary.config.js';
+import { CloudinaryProvider } from '../config/cloudinary.config.js';
+import { PrismaModule } from '../prisma/prisma.module.js';
 
 @Module({
-  controllers: [UploadController],
-  providers: [PrismaService, UploadService, CloudinaryProvider],
+  imports: [PrismaModule],
+  providers: [UploadService, CloudinaryProvider],
   exports: [UploadService],
 })
 export class UploadModule {}

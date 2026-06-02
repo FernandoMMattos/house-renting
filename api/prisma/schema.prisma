@@ -23,32 +23,46 @@ model User {
 }
 
 model Property {
-  id            String   @id @default(cuid())
-  street        String
-  number        Int
-  areaCode      Int
-  description   String
-  eirCode       String
-  propertyType  String
-  roomType      String
-  bedrooms      Int
-  bathrooms     Int
-  sharingWith   Int
-  availableFrom DateTime
-  availableFor  DateTime
-  price         Int
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now())
-  authorId      String
-  isActive      Boolean  @default(true)
-  image         Image[]
-  author        User     @relation(fields: [authorId], references: [id])
+  id             String       @id @default(cuid())
+  street         String
+  number         Int
+  areaCode       String
+  description    String
+  eirCode        String
+  propertyType   PropertyType
+  roomType       RoomType
+  bedrooms       Int
+  bathrooms      Int
+  sharingWith    Int
+  availableFrom  DateTime
+  availableUntil DateTime
+  price          Decimal      @db.Decimal(10, 2)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  authorId       String
+  isActive       Boolean      @default(true)
+  images         Image[]
+  author         User         @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Image {
-  id       String   @id @default(cuid())
-  url      String
-  publicId String
-  houseId  String
-  house    Property @relation(fields: [houseId], references: [id])
+  id         String   @id @default(cuid())
+  url        String
+  publicId   String
+  propertyId String
+  createdAt  DateTime @default(now())
+  property   Property @relation(fields: [propertyId], references: [id])
+}
+
+enum PropertyType {
+  HOUSE
+  APARTMENT
+  FLAT
+  STUDIO
+}
+
+enum RoomType {
+  SINGLE
+  DOUBLE
+  SHARED
 }

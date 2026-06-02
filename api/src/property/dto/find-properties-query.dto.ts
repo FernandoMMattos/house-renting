@@ -1,5 +1,14 @@
-import { IsOptional, IsString, IsInt, Min, Max } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsInt,
+  Min,
+  Max,
+  IsArray,
+  IsEnum,
+} from 'class-validator';
 import { Type, Transform } from 'class-transformer';
+import { PropertyType, RoomType } from '../../../generated/prisma/enums.js';
 
 export class FindPropertiesQueryDto {
   @IsOptional()
@@ -7,19 +16,23 @@ export class FindPropertiesQueryDto {
     typeof value === 'string'
       ? value
           .split(',')
-          .map(Number)
-          .filter((n) => !isNaN(n))
+          .map((s) => s.trim())
+          .filter(Boolean)
       : [],
   )
-  areaCodes?: number[];
+  @IsArray()
+  @IsString({ each: true })
+  areaCodes?: string[];
 
   @IsOptional()
   @IsString()
-  roomType?: string;
+  @IsEnum(RoomType)
+  roomType?: RoomType;
 
   @IsOptional()
   @IsString()
-  propertyType?: string;
+  @IsEnum(PropertyType)
+  propertyType?: PropertyType;
 
   @IsOptional()
   @Type(() => Number)
@@ -52,4 +65,17 @@ export class FindPropertiesQueryDto {
   @IsInt()
   @Min(0)
   sharingWith?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  limit?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  offset?: number;
 }

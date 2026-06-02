@@ -5,24 +5,30 @@ import {
   Min,
   Length,
   Max,
+  MaxLength,
+  IsNotEmpty,
+  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PropertyType, RoomType } from '../../../generated/prisma/enums.js';
 
 export class PropertyDto {
   @IsString()
+  @MaxLength(50)
+  @IsNotEmpty()
   street: string;
 
   @Type(() => Number)
   @IsInt()
   number: number;
 
-  @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(24)
-  areaCode: number;
+  areaCode: string;
 
   @IsString()
+  @MaxLength(1500)
   description: string;
 
   @Length(7)
@@ -30,10 +36,12 @@ export class PropertyDto {
   eirCode: string;
 
   @IsString()
-  propertyType: string;
+  @IsEnum(PropertyType)
+  propertyType: PropertyType;
 
   @IsString()
-  roomType: string;
+  @IsEnum(RoomType)
+  roomType: RoomType;
 
   @Type(() => Number)
   @IsInt()
@@ -53,9 +61,10 @@ export class PropertyDto {
   availableFrom: string;
 
   @IsDateString()
-  availableFor: string;
+  availableUntil: string;
 
   @Type(() => Number)
   @Min(0)
+  @IsInt()
   price: number;
 }
