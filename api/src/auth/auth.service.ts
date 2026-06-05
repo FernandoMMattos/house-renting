@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto, LoginDto } from './dto/auth.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { BCRYPT_SALT_ROUNDS } from '../common/constants.js';
+import { BCRYPT_SALT_ROUNDS, JWT_TTL_MS } from '../common/constants.js';
 
 @Injectable()
 export class AuthService {
@@ -47,5 +47,17 @@ export class AuthService {
 
   private signToken(userId: string, email: string): string {
     return this.jwtService.sign({ sub: userId, email });
+  }
+
+  async logout(token: string) {
+    const now = new Date();
+    await this.prisma.$transaction([
+      this.prisma.tokenBlacklist.create({
+        data: { token, expiresAt: new Date(now.getTime() + JWT_TTL_MS) },
+      }),
+      this.prisma.tokenBlacklist.deleteMany({
+        where: { expiresAt: { lt: now } },
+      }),
+    ]);
   }
 }

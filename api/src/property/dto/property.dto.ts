@@ -41,12 +41,10 @@ export class PropertyDto {
   eirCode: string;
 
   @ApiProperty()
-  @IsString()
   @IsEnum(PropertyType)
   propertyType: PropertyType;
 
   @ApiProperty()
-  @IsString()
   @IsEnum(RoomType)
   roomType: RoomType;
 

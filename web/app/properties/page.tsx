@@ -15,29 +15,11 @@ const PropertiesPage = () => {
 
   useEffect(() => {
     setLoading(true);
-    getProperties({
-      ...(filters.areaCodes.length > 0 && { areaCodes: filters.areaCodes }),
-      ...(filters.roomType && { roomType: filters.roomType }),
-      ...(filters.propertyType && { propertyType: filters.propertyType }),
-      ...(filters.minPrice && { minPrice: filters.minPrice }),
-      ...(filters.maxPrice && { maxPrice: filters.maxPrice }),
-      ...(filters.bedrooms && { bedrooms: filters.bedrooms }),
-      ...(filters.bathrooms && { bathrooms: filters.bathrooms }),
-      ...(filters.sharingWith && { sharingWith: filters.sharingWith }),
-    })
+    getProperties(filters)
       .then((response) => setProperties(response.data))
       .catch(() => setError("Failed to load properties"))
       .finally(() => setLoading(false));
-  }, [
-    filters.areaCodes,
-    filters.bathrooms,
-    filters.bedrooms,
-    filters.maxPrice,
-    filters.minPrice,
-    filters.propertyType,
-    filters.roomType,
-    filters.sharingWith,
-  ]);
+  }, [filters]);
 
   const activeLabel =
     filters.areaCodes.length > 0

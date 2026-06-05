@@ -21,20 +21,17 @@ export class FindPropertiesQueryDto {
           .filter(Boolean)
       : [],
   )
-  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   areaCodes?: string[];
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
   @IsEnum(RoomType)
   roomType?: RoomType;
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
   @IsEnum(PropertyType)
   propertyType?: PropertyType;
 

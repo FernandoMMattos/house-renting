@@ -8,6 +8,7 @@ import { Property } from "@/types/property";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { useAuth } from "@/context/AuthContext";
 
 const PropertyMap = dynamic(() => import("@/components/PropertyMap"), {
   ssr: false,
@@ -17,6 +18,7 @@ const FALLBACK = "https://placehold.co/800x500";
 
 const PropertyPage = () => {
   const { id } = useParams();
+  const { user } = useAuth()
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -105,7 +107,7 @@ const PropertyPage = () => {
         <section className="flex flex-col gap-2">
           <h2 className="text-xl font-semibold">Listed by</h2>
           <p>{property.author.name}</p>
-          <p className="text-gray-500">{property.author.email}</p>
+          {user && <p className="text-gray-500">{property.author.email}</p>}
         </section>
       </main>
       <Footer />

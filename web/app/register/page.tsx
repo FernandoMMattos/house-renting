@@ -17,22 +17,22 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
     const form = e.currentTarget;
     const name = (form.elements.namedItem("name") as HTMLInputElement).value;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
     const password = (form.elements.namedItem("password") as HTMLInputElement)
-      .value;
+    .value;
     const confirmPassword = (
       form.elements.namedItem("confirmPassword") as HTMLInputElement
     ).value;
-
+    
     if (password !== confirmPassword) {
       setError("Passwords doesn't match");
       return;
     }
 
     try {
+      setLoading(true);
       await register(name, email, password);
       router.push("/dashboard");
     } catch {

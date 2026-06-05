@@ -5,8 +5,8 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
-  Param,
   Post,
+  Query,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -49,11 +49,13 @@ export class UploadController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':publicId')
+  @Delete()
+  @HttpCode(HttpStatus.NO_CONTENT)
   async removeImage(
-    @Param('publicId') publicId: string,
+    @Query('publicId') publicId: string,
     @CurrentUser() user: JwtUser,
   ) {
-    return this.uploadService.deleteImage(publicId, user.id);
+    if (!publicId) throw new BadRequestException('publicId query param is required');
+    await this.uploadService.deleteImage(publicId, user.id);
   }
 }
