@@ -1,5 +1,5 @@
 export interface PropertyFilters {
-  areaCodes: number[],
+  areaCodes: string[],
   roomType: string,
   propertyType: string,
   sharingWith: string,

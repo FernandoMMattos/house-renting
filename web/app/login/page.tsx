@@ -13,9 +13,11 @@ const LoginPage = () => {
   const { login } = useAuth();
   const router = useRouter();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     const form = e.currentTarget;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
     const password = (form.elements.namedItem("password") as HTMLInputElement)
@@ -26,6 +28,8 @@ const LoginPage = () => {
       router.push("/dashboard");
     } catch {
       setError("Invalid credentials");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -34,15 +38,15 @@ const LoginPage = () => {
       onSubmit={handleSubmit}
       title="Welcome!"
       className="
-        mx-auto
         flex
-        max-w-md
         flex-col
         gap-4
         rounded-2xl
         border
         p-8
         text-center
+        m-auto
+        w-1/3
       "
     >
       <FormField label="Email" htmlFor="email">
@@ -56,10 +60,16 @@ const LoginPage = () => {
       </FormField>
 
       <FormField label="Password" htmlFor="password">
-        <Input type="password" id="password" name="password" required />
+        <Input
+          type="password"
+          id="password"
+          name="password"
+          required
+          minLength={5}
+        />
       </FormField>
 
-      {error && <p>{error}</p>}
+      {error && <p className="text-sm text-red-500">{error}</p>}
 
       <p className="text-sm">
         Don't have an account?{" "}
@@ -68,7 +78,7 @@ const LoginPage = () => {
         </Link>
       </p>
 
-      <FormButton type="submit" disabled={false}>
+      <FormButton type="submit" disabled={loading}>
         Enter
       </FormButton>
     </Form>

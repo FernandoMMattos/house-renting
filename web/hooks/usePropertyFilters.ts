@@ -1,25 +1,10 @@
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useCallback } from "react";
 import { EMPTY_FILTERS, PropertyFilters } from "@/types/filters";
-
-const filtersToParams = (filters: PropertyFilters): URLSearchParams => {
-  const params = new URLSearchParams();
-  if (filters.areaCodes.length > 0)
-    params.set("areaCodes", filters.areaCodes.join(","));
-  if (filters.roomType) params.set("roomType", filters.roomType);
-  if (filters.propertyType) params.set("propertyType", filters.propertyType);
-  if (filters.minPrice) params.set("minPrice", filters.minPrice);
-  if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
-  if (filters.bedrooms) params.set("bedrooms", filters.bedrooms);
-  if (filters.bathrooms) params.set("bathrooms", filters.bathrooms);
-  if (filters.sharingWith) params.set("sharingWith", filters.sharingWith);
-  return params;
-};
+import { filtersToParams } from "@/lib/property";
 
 const paramsToFilters = (searchParams: URLSearchParams): PropertyFilters => ({
-  areaCodes: searchParams.get("areaCodes")
-    ? searchParams.get("areaCodes")!.split(",").map(Number)
-    : [],
+  areaCodes: searchParams.get("areaCodes")?.split(",").filter(Boolean) ?? [],
   roomType: searchParams.get("roomType") ?? "",
   propertyType: searchParams.get("propertyType") ?? "",
   minPrice: searchParams.get("minPrice") ?? "",
@@ -32,22 +17,29 @@ const paramsToFilters = (searchParams: URLSearchParams): PropertyFilters => ({
 const usePropertyFilters = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const filters = paramsToFilters(searchParams);
 
-  const [filters, setFilters] = useState<PropertyFilters>(() =>
-    paramsToFilters(searchParams),
+  const updateFilters = useCallback(
+    (next: PropertyFilters) => {
+      router.replace(
+        `/properties?${new URLSearchParams(filtersToParams(next)).toString()}`,
+      );
+    },
+    [router],
   );
 
-  const updateFilters = (next: PropertyFilters) => {
-    setFilters(next);
-    router.replace(`?${filtersToParams(next).toString()}`);
-  };
+  const handleChange = useCallback(
+    (
+      field: keyof PropertyFilters,
+      value: PropertyFilters[keyof PropertyFilters],
+    ) => updateFilters({ ...filters, [field]: value }),
+    [filters, updateFilters],
+  );
 
-  const handleChange = (
-    field: keyof PropertyFilters,
-    value: PropertyFilters[keyof PropertyFilters],
-  ) => updateFilters({ ...filters, [field]: value });
-
-  const handleClear = () => updateFilters(EMPTY_FILTERS);
+  const handleClear = useCallback(
+    () => updateFilters(EMPTY_FILTERS),
+    [updateFilters],
+  );
 
   return { filters, handleChange, handleClear };
 };

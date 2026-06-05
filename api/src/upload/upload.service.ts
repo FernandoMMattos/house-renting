@@ -34,6 +34,18 @@ export class UploadService {
     });
   }
 
+  private async uploadAll(files: Express.Multer.File[], concurrency = 3) {
+    const results: UploadApiResponse[] = [];
+    for (let i = 0; i < files.length; i += concurrency) {
+      const batch = files.slice(i, i + concurrency);
+      const batchResults = await Promise.all(
+        batch.map((f) => this.uploadToCloudinary(f)),
+      );
+      results.push(...batchResults);
+    }
+    return results;
+  }
+
   async uploadImages(
     files: Express.Multer.File[],
     propertyId: string,
@@ -46,9 +58,7 @@ export class UploadService {
     if (property.authorId !== requesterId)
       throw new ForbiddenException('You do not own this property');
 
-    const cloudinaryResults = await Promise.all(
-      files.map((file) => this.uploadToCloudinary(file)),
-    );
+    const cloudinaryResults = await this.uploadAll(files);
 
     try {
       return await this.prisma.image.createMany({
@@ -66,9 +76,9 @@ export class UploadService {
     }
   }
 
-  async deleteImage(imageId: string, requesterId: string): Promise<void> {
-    const image = await this.prisma.image.findUnique({
-      where: { id: imageId },
+  async deleteImage(publicId: string, requesterId: string): Promise<void> {
+    const image = await this.prisma.image.findFirst({
+      where: { publicId },
       include: { property: { select: { authorId: true } } },
     });
 
@@ -77,7 +87,14 @@ export class UploadService {
     if (image.property.authorId !== requesterId)
       throw new ForbiddenException("You don't own this image");
 
-    await cloudinary.uploader.destroy(image.publicId);
-    await this.prisma.image.delete({ where: { id: imageId } });
+    try {
+      await cloudinary.uploader.destroy(image.publicId);
+    } catch (error) {
+      console.error(
+        `Failed to delete Cloudinary asset ${image.publicId}`,
+        error,
+      );
+    }
+    await this.prisma.image.delete({ where: { id: image.id } });
   }
 }

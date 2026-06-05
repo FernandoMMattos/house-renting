@@ -7,11 +7,10 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto, LoginDto } from './dto/auth.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { BCRYPT_SALT_ROUNDS } from '../common/constants.js';
 
 @Injectable()
 export class AuthService {
-  private readonly SALT_ROUNDS = 10;
-
   constructor(
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
@@ -23,7 +22,7 @@ export class AuthService {
     });
     if (exists) throw new ConflictException('Email already in use');
 
-    const hashedPassword = await bcrypt.hash(dto.password, this.SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(dto.password, BCRYPT_SALT_ROUNDS);
 
     const user = await this.prisma.user.create({
       data: { email: dto.email, name: dto.name, password: hashedPassword },

@@ -1,32 +1,36 @@
-import { useRouter } from "next/navigation";
+"use client";
+
+import { PropertyFilters } from "@/types/filters";
+import usePropertyFilters from "@/hooks/usePropertyFilters";
 import Button from "./Button";
 
-const filters = [
-  {
-    label: "Single Room",
-    value: "single",
-    param: "roomType",
-  },
-  { label: "Double Room", value: "double", param: "roomType" },
-  { label: "Shared Room", value: "shared", param: "roomType" },
-  { label: "House", value: "house", param: "propertyType" },
-  { label: "Flat", value: "flat", param: "propertyType" },
-  { label: "Apartment", value: "apartment", param: "propertyType" },
+const FILTERS_OPTIONS = [
+  { label: "Single Room", value: "SINGLE", param: "roomType" },
+  { label: "Double Room", value: "DOUBLE", param: "roomType" },
+  { label: "Shared Room", value: "SHARED", param: "roomType" },
+  { label: "House", value: "HOUSE", param: "propertyType" },
+  { label: "Apartment", value: "APARTMENT", param: "propertyType" },
+  { label: "Studio", value: "STUDIO", param: "propertyType" },
+  { label: "Flat", value: "FLAT", param: "propertyType" },
 ];
 
-const DashboardSections = () => {
-  const router = useRouter();
+const DashBoardSections = () => {
+  const { handleChange } = usePropertyFilters();
 
   const handleFilter = ({ value, param }: { value: string; param: string }) => {
-    router.push(`/properties?${param}=${value}`);
+    handleChange(param as keyof PropertyFilters, value);
   };
 
   return (
     <section className="mx-20 flex flex-col">
       <span className="font-bold text-2xl my-10">Browse by filters</span>
       <div className="mb-10 flex gap-4">
-        {filters.map((filter) => (
-          <Button key={filter.value} onClick={() => handleFilter(filter)}>
+        {FILTERS_OPTIONS.map((filter) => (
+          <Button
+            key={filter.value}
+            onClick={() => handleFilter(filter)}
+            className="flex-1"
+          >
             {filter.label}
           </Button>
         ))}
@@ -35,4 +39,4 @@ const DashboardSections = () => {
   );
 };
 
-export default DashboardSections;
+export default DashBoardSections;

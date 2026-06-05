@@ -4,10 +4,11 @@ import Input from "@/components/Input";
 import FormButton from "@/components/FormButton";
 import PropertyCard from "@/components/PropertyCard";
 import { useAuth } from "@/context/AuthContext";
-import { updateUser, getMyProperties } from "@/lib/user";
+import { updateUser } from "@/lib/user";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Property } from "@/types/property";
+import { getMyProperties } from "@/lib/property";
 
 const ProfilePage = () => {
   const { user, logout } = useAuth();
@@ -16,14 +17,16 @@ const ProfilePage = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loadingProperties, setLoadingProperties] = useState(true);
 
-  const [name, setName] = useState("");
+  const [name, setName] = useState(user?.name ?? "");
   const [password, setPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!user) return;
     getMyProperties()
       .then(setProperties)
       .catch(() => setError("Failed to load your properties."))
@@ -44,10 +47,11 @@ const ProfilePage = () => {
       setSaving(true);
       await updateUser({
         ...(name !== user?.name && { name }),
-        ...(password && { password }),
+        ...(password && { password, currentPassword }),
       });
       setSuccess("Profile updated successfully.");
       setPassword("");
+      setCurrentPassword("");
       setConfirmPassword("");
     } catch {
       setError("Failed to update profile. Please try again.");
@@ -62,6 +66,15 @@ const ProfilePage = () => {
     <div className="flex min-h-screen justify-center py-10 px-4">
       <div className="w-full max-w-5xl flex flex-col gap-10">
         <section className="flex flex-col gap-4">
+          <div className="relative md:col-span-2 place-self-end">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="absolute cursor-pointer mt-3 text-sm text-gray-500 hover:text-gray-800"
+            >
+              ← Back
+            </button>
+          </div>
           <h1 className="text-3xl font-bold">My Profile</h1>
 
           <form
@@ -81,10 +94,21 @@ const ProfilePage = () => {
             </div>
 
             <div className="flex flex-col gap-1">
+              <label htmlFor="currentPassword">Current Password</label>
+              <Input
+                id="currentPassword"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Required to change password"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
               <label htmlFor="name">Name</label>
               <Input
                 id="name"
-                value={user.name}
+                value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
                 required
@@ -162,10 +186,7 @@ const ProfilePage = () => {
 
         <button
           type="button"
-          onClick={() => {
-            logout();
-            router.push("/");
-          }}
+          onClick={() => logout()}
           className="self-start text-sm text-red-500 underline hover:cursor-pointer"
         >
           Log out

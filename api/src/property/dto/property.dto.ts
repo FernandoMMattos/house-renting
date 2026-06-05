@@ -4,67 +4,80 @@ import {
   IsString,
   Min,
   Length,
-  Max,
   MaxLength,
   IsNotEmpty,
   IsEnum,
+  IsDecimal,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PropertyType, RoomType } from '../../../generated/prisma/enums.js';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class PropertyDto {
+  @ApiProperty()
   @IsString()
   @MaxLength(50)
   @IsNotEmpty()
   street: string;
 
+  @ApiProperty()
   @Type(() => Number)
   @IsInt()
   number: number;
 
-  @IsInt()
-  @Min(1)
-  @Max(24)
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   areaCode: string;
 
+  @ApiProperty()
   @IsString()
   @MaxLength(1500)
   description: string;
 
+  @ApiProperty()
   @Length(7)
   @IsString()
   eirCode: string;
 
+  @ApiProperty()
   @IsString()
   @IsEnum(PropertyType)
   propertyType: PropertyType;
 
+  @ApiProperty()
   @IsString()
   @IsEnum(RoomType)
   roomType: RoomType;
 
+  @ApiProperty()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   bedrooms: number;
 
+  @ApiProperty()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   bathrooms: number;
 
+  @ApiProperty()
   @Type(() => Number)
   @IsInt()
   sharingWith: number;
 
+  @ApiProperty()
   @IsDateString()
   availableFrom: string;
 
+  @ApiProperty()
   @IsDateString()
   availableUntil: string;
 
+  @ApiProperty()
   @Type(() => Number)
   @Min(0)
-  @IsInt()
+  @IsDecimal()
   price: number;
 }

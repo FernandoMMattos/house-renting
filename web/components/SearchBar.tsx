@@ -2,13 +2,13 @@ import { useState, KeyboardEvent } from "react";
 import { parseAreaCodes } from "@/lib/parseAreaCodes";
 
 interface SearchBarProps {
-  onSearch: (codes: number[]) => void;
+  onSearch: (codes: string[]) => void;
   placeholder: string;
 }
 
 const SearchBar = ({ onSearch, placeholder }: SearchBarProps) => {
   const [inputValue, setInputValue] = useState("");
-  const [selectedCodes, setSelectedCodes] = useState<number[]>([]);
+  const [selectedCodes, setSelectedCodes] = useState<string[]>([]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== "Enter") return;
@@ -16,9 +16,8 @@ const SearchBar = ({ onSearch, placeholder }: SearchBarProps) => {
     const parsed = parseAreaCodes(inputValue);
     if (parsed.length === 0) return;
 
-    // merge with existing, deduplicate
     const merged = [...new Set([...selectedCodes, ...parsed])].sort(
-      (a, b) => a - b,
+      (a, b) => Number(a) - Number(b),
     );
 
     setSelectedCodes(merged);
@@ -26,7 +25,7 @@ const SearchBar = ({ onSearch, placeholder }: SearchBarProps) => {
     onSearch(merged);
   };
 
-  const removeCode = (code: number) => {
+  const removeCode = (code: string) => {
     const next = selectedCodes.filter((c) => c !== code);
     setSelectedCodes(next);
     onSearch(next);

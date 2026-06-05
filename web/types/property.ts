@@ -2,7 +2,7 @@ export interface Property {
   id: string;
   street: string;
   number: number;
-  areaCode: number;
+  areaCode: string;
   price: number;
   bedrooms: number;
   bathrooms: number;
@@ -11,21 +11,28 @@ export interface Property {
   roomType: string;
   description: string;
   eirCode: string;
-  availableFrom: string;
-  availableFor: string;
-  image: {
+  availableFrom: Date;
+  availableUntil: Date;
+  isActive: boolean;
+  images: {
     url: string;
     publicId: string;
   }[];
   author: {
+    id: string;
     name: string;
     email: string;
   };
 }
 
-export type CreatePropertyData = Omit<Property, "id" | "image" | "author">;
+export type CreatePropertyData = Omit<
+  Property,
+  "id" | "images" | "author" | "isActive"
+>;
 
-export type UpdatePropertyData = Optional<Property>
+export type UpdatePropertyData = Partial<
+  Omit<Property, "id" | "author" | "images">
+>;
 
 export type PropertyCard = Pick<
   Property,
@@ -39,5 +46,5 @@ export type PropertyCard = Pick<
   | "sharingWith"
   | "propertyType"
   | "roomType"
-  | "image"
+  | "images"
 >;

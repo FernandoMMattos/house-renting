@@ -1,26 +1,14 @@
 import { CreatePropertyData, UpdatePropertyData } from "@/types/property";
 import api from "./api";
+import { EMPTY_FILTERS, PropertyFilters } from "@/types/filters";
 
 export const createProperty = async (data: CreatePropertyData) => {
   const { data: response } = await api.post("/properties", data);
   return response;
 };
 
-export const getProperties = async (filters?: Record<string, any>) => {
-  const { areaCodes, ...rest } = filters ?? {};
-
-  const params = new URLSearchParams();
-
-  if (areaCodes?.length) {
-    params.set("areaCodes", areaCodes.join(","));
-  }
-
-  Object.entries(rest).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      params.set(key, String(value));
-    }
-  });
-
+export const getProperties = async (filters?: Partial<PropertyFilters>) => {
+  const params = filtersToParams(filters ?? EMPTY_FILTERS);
   const { data } = await api.get("/properties", { params });
   return data;
 };
@@ -35,7 +23,14 @@ export const updateProperty = async (id: string, data: UpdatePropertyData) => {
   return response;
 };
 
-export const parseAreaCode = (searchTerm: string): number | undefined => {
-  const match = searchTerm.trim().match(/\b(\d{1,2})\b/);
-  return match ? Number(match[1]) : undefined;
+export const getMyProperties = async () => {
+  const { data } = await api.get("/properties/me");
+  return data;
 };
+
+export const filtersToParams = (filters: Partial<PropertyFilters>) =>
+  Object.fromEntries(
+    Object.entries(filters)
+      .filter(([, v]) => (Array.isArray(v) ? v.length > 0 : v !== ""))
+      .map(([k, v]) => [k, Array.isArray(v) ? v.join(",") : v]),
+  );

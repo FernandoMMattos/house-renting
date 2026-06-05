@@ -1,13 +1,11 @@
-export async function uploadHousePhotos (files: File[], houseId: string) {
-  const formData = new FormData()
-  files.forEach(file => formData.append('photos', file))
-  formData.append('houseId', houseId)
+import api from "./api";
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/house-photos`, {
-    method: 'POST',
-    body: formData
-  })
+export async function uploadHousePhotos(files: File[], propertyId: string) {
+  const formData = new FormData();
+  files.forEach((file) => formData.append("photos", file));
+  formData.append("propertyId", propertyId);
 
-  if (!res.ok) throw new Error("Upload Failed")
-    return res.json()
+  const { data } = await api.post("/upload/house-photos", formData);
+
+  return data;
 }

@@ -5,7 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import { PropertyModule } from './property/property.module.js';
 import { UploadModule } from './upload/upload.module.js';
 import { UsersModule } from './users/users.module.js';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -16,6 +17,12 @@ import { ThrottlerModule } from '@nestjs/throttler';
     PropertyModule,
     UploadModule,
     UsersModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

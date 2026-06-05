@@ -18,7 +18,7 @@ import { PropertyDto } from './dto/property.dto.js';
 import { FindPropertiesQueryDto } from './dto/find-properties-query.dto.js';
 import { UpdatePropertyDto } from './dto/update-property.dto.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
-import type { JwtUser } from '../common/types/jwt-user.decorator.js';
+import type { JwtUser } from '../common/types/jwt-user.types.js';
 
 @Controller('properties')
 export class PropertyController {

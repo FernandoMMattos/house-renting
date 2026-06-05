@@ -1,29 +1,25 @@
-"use client";
-
-import { getProperties } from "@/lib/property";
-import { useEffect, useState } from "react";
-import PropertyCard from "./PropertyCard";
 import { Property } from "@/types/property";
+import PropertyCard from "./PropertyCard";
 
-const RecentAdded = () => {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+const RecentAdded = async () => {
+  let properties: Property[] = [];
 
-  useEffect(() => {
-    getProperties()
-      .then(setProperties)
-      .catch(() => setError("Failed to load properties"))
-      .finally(() => setLoading(false));
-  }, []);
+  try {
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api";
+    const res = await fetch(`${baseUrl}/properties`, { cache: "no-store" });
+    if (res.ok) {
+      const data = await res.json();
+      properties = data.data ?? [];
+    }
+  } catch {
+    // render empty state on error
+  }
 
   return (
     <section className="mx-20 flex flex-col">
       <p className="font-bold text-2xl my-10">Recently added properties</p>
-      {error ? <p className="text-red-500 mx-20">{error}</p> : ""}
-      {loading ? (
-        <p className="text-gray-400 mx-20">Loading...</p>
-      ) : properties.length === 0 ? (
+      {properties.length === 0 ? (
         <p className="text-gray-400">No properties found.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

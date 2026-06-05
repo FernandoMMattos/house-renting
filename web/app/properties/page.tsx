@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 const PropertiesPage = () => {
   const { filters, handleChange, handleClear } = usePropertyFilters();
   const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -19,20 +19,29 @@ const PropertiesPage = () => {
       ...(filters.areaCodes.length > 0 && { areaCodes: filters.areaCodes }),
       ...(filters.roomType && { roomType: filters.roomType }),
       ...(filters.propertyType && { propertyType: filters.propertyType }),
-      ...(filters.minPrice && { minPrice: Number(filters.minPrice) }),
-      ...(filters.maxPrice && { maxPrice: Number(filters.maxPrice) }),
-      ...(filters.bedrooms && { bedrooms: Number(filters.bedrooms) }),
-      ...(filters.bathrooms && { bathrooms: Number(filters.bathrooms) }),
-      ...(filters.sharingWith && { sharingWith: Number(filters.sharingWith) }),
+      ...(filters.minPrice && { minPrice: filters.minPrice }),
+      ...(filters.maxPrice && { maxPrice: filters.maxPrice }),
+      ...(filters.bedrooms && { bedrooms: filters.bedrooms }),
+      ...(filters.bathrooms && { bathrooms: filters.bathrooms }),
+      ...(filters.sharingWith && { sharingWith: filters.sharingWith }),
     })
-      .then(setProperties)
+      .then((response) => setProperties(response.data))
       .catch(() => setError("Failed to load properties"))
       .finally(() => setLoading(false));
-  }, [filters]);
+  }, [
+    filters.areaCodes,
+    filters.bathrooms,
+    filters.bedrooms,
+    filters.maxPrice,
+    filters.minPrice,
+    filters.propertyType,
+    filters.roomType,
+    filters.sharingWith,
+  ]);
 
   const activeLabel =
     filters.areaCodes.length > 0
-      ? `Dublin ${filters.areaCodes.sort((a, b) => a - b).join(", ")}`
+      ? `Dublin ${filters.areaCodes.sort((a, b) => Number(a) - Number(b)).join(", ")}`
       : "All";
 
   return (

@@ -1,6 +1,6 @@
 "use client";
+
 import AreaCodeFilter from "@/components/AreaCodeFilter";
-import FormField from "@/components/FormField";
 import Select from "@/components/Select";
 import Input from "@/components/Input";
 import { PropertyFilters } from "@/types/filters";
@@ -14,18 +14,8 @@ interface Props {
   onClear: () => void;
 }
 
-const hasActiveFilters = (filters: PropertyFilters) =>
-  filters.areaCodes.length > 0 ||
-  !!filters.roomType ||
-  !!filters.propertyType ||
-  !!filters.minPrice ||
-  !!filters.maxPrice ||
-  !!filters.bedrooms ||
-  !!filters.bathrooms ||
-  !!filters.sharingWith;
-
 const PropertyFilterPanel = ({ values, onChange, onClear }: Props) => {
-  const select =
+  const createChangeHandler =
     (field: keyof PropertyFilters) =>
     (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) =>
       onChange(field, e.target.value);
@@ -41,6 +31,8 @@ const PropertyFilterPanel = ({ values, onChange, onClear }: Props) => {
     !!values.sharingWith,
   ].filter(Boolean).length;
 
+  const hasActiveFilters = activeCount > 0;
+
   return (
     <aside className="w-72 shrink-0 flex flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-5 self-start sticky top-6">
       {/* Header */}
@@ -53,7 +45,7 @@ const PropertyFilterPanel = ({ values, onChange, onClear }: Props) => {
             </span>
           )}
         </div>
-        {hasActiveFilters(values) && (
+        {hasActiveFilters && (
           <button
             type="button"
             onClick={onClear}
@@ -69,7 +61,7 @@ const PropertyFilterPanel = ({ values, onChange, onClear }: Props) => {
         <div className="py-4 first:pt-0">
           <AreaCodeFilter
             selected={values.areaCodes}
-            onChange={(codes) => onChange("areaCodes", codes)}
+            onChange={(codes: string[]) => onChange("areaCodes", codes)}
           />
         </div>
 
@@ -81,13 +73,26 @@ const PropertyFilterPanel = ({ values, onChange, onClear }: Props) => {
           <Select
             id="propertyType"
             value={values.propertyType}
-            onChange={select("propertyType")}
-            className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 focus:border-gray-800 focus:outline-none focus:ring-0"
+            onChange={createChangeHandler("propertyType")}
+            className="
+              w-full 
+              rounded-lg 
+              border 
+              border-gray-200 
+              bg-gray-50 
+              px-3 
+              py-2 
+              text-sm 
+              text-gray-800 
+              focus:border-gray-800 
+              focus:outline-none 
+              focus:ring-0"
           >
             <option value="">Any</option>
-            <option value="house">House</option>
-            <option value="flat">Flat</option>
-            <option value="apartment">Apartment</option>
+            <option value="HOUSE">House</option>
+            <option value="FLAT">Flat</option>
+            <option value="APARTMENT">Apartment</option>
+            <option value="STUDIO">Studio</option>
           </Select>
         </div>
 
@@ -99,13 +104,24 @@ const PropertyFilterPanel = ({ values, onChange, onClear }: Props) => {
           <Select
             id="roomType"
             value={values.roomType}
-            onChange={select("roomType")}
-            className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 focus:border-gray-800 focus:outline-none focus:ring-0"
+            onChange={createChangeHandler("roomType")}
+            className="w-full 
+              rounded-lg 
+              border 
+              border-gray-200 
+              bg-gray-50 
+              px-3 
+              py-2 
+              text-sm 
+              text-gray-800 
+              focus:border-gray-800 
+              focus:outline-none 
+              focus:ring-0"
           >
             <option value="">Any</option>
-            <option value="single">Single</option>
-            <option value="double">Double</option>
-            <option value="sharing">Sharing</option>
+            <option value="SINGLE">Single</option>
+            <option value="DOUBLE">Double</option>
+            <option value="SHARED">Shared</option>
           </Select>
         </div>
 
@@ -121,8 +137,19 @@ const PropertyFilterPanel = ({ values, onChange, onClear }: Props) => {
               min="0"
               placeholder="Min"
               value={values.minPrice}
-              onChange={select("minPrice")}
-              className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-gray-800 focus:outline-none"
+              onChange={createChangeHandler("minPrice")}
+              className="w-full 
+                rounded-lg 
+                border 
+                border-gray-200 
+                bg-gray-50 
+                px-3 
+                py-2 
+                text-sm 
+                text-gray-800 
+                placeholder-gray-400 
+                focus:border-gray-800 
+                focus:outline-none"
             />
             <span className="text-gray-400 text-sm shrink-0">—</span>
             <Input
@@ -131,8 +158,19 @@ const PropertyFilterPanel = ({ values, onChange, onClear }: Props) => {
               min="0"
               placeholder="Max"
               value={values.maxPrice}
-              onChange={select("maxPrice")}
-              className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-gray-800 focus:outline-none"
+              onChange={createChangeHandler("maxPrice")}
+              className="w-full 
+                rounded-lg 
+                border 
+                border-gray-200 
+                bg-gray-50 
+                px-3 
+                py-2 
+                text-sm 
+                text-gray-800 
+                placeholder-gray-400 
+                focus:border-gray-800 
+                focus:outline-none"
             />
           </div>
         </div>
@@ -145,7 +183,7 @@ const PropertyFilterPanel = ({ values, onChange, onClear }: Props) => {
           <Select
             id="bedrooms"
             value={values.bedrooms}
-            onChange={select("bedrooms")}
+            onChange={createChangeHandler("bedrooms")}
             className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 focus:border-gray-800 focus:outline-none focus:ring-0"
           >
             <option value="">Any</option>
@@ -165,7 +203,7 @@ const PropertyFilterPanel = ({ values, onChange, onClear }: Props) => {
           <Select
             id="bathrooms"
             value={values.bathrooms}
-            onChange={select("bathrooms")}
+            onChange={createChangeHandler("bathrooms")}
             className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 focus:border-gray-800 focus:outline-none focus:ring-0"
           >
             <option value="">Any</option>
@@ -185,7 +223,7 @@ const PropertyFilterPanel = ({ values, onChange, onClear }: Props) => {
           <Select
             id="sharingWith"
             value={values.sharingWith}
-            onChange={select("sharingWith")}
+            onChange={createChangeHandler("sharingWith")}
             className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 focus:border-gray-800 focus:outline-none focus:ring-0"
           >
             <option value="">Any</option>

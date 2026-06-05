@@ -1,3 +1,5 @@
+import { useRouter } from "next/navigation";
+
 type FormProps = React.FormHTMLAttributes<HTMLFormElement> & {
   title?: string;
   className?: string;
@@ -10,19 +12,23 @@ const Form = ({
   className = "",
   ...props
 }: FormProps) => {
+  const router = useRouter();
   return (
-    <div className="flex min-h-screen justify-center py-10 px-4">
-      <div className="w-full max-w-5xl">
-        <form onSubmit={onSubmit} className={className} {...props}>
-          <div className="md:col-span-2 flex justify-center">
-            {title && (
-              <h1 className="mb-4 text-center text-3xl font-bold">{title}</h1>
-            )}
+    <form onSubmit={onSubmit} className={className} {...props}>
+        {title && (
+          <div className="justify-center">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="block cursor-pointer mt-3 text-sm text-gray-500 hover:text-gray-800 "
+            >
+              ← Back
+            </button>
+            <h1 className="block justify-center text-3xl font-bold">{title}</h1>
           </div>
-          {children}
-        </form>
-      </div>
-    </div>
+        )}
+      {children}
+    </form>
   );
 };
 

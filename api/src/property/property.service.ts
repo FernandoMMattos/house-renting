@@ -86,7 +86,7 @@ export class PropertyService {
 
   async findByAuthor(id: string) {
     return this.prisma.property.findMany({
-      where: { authorId: id },
+      where: { authorId: id, isActive: true },
       orderBy: { createdAt: 'desc' },
       include: { images: true },
     });
@@ -94,6 +94,16 @@ export class PropertyService {
 
   async update(requesterId: string, id: string, dto: UpdatePropertyDto) {
     await this.findPropertyAndVerifyOwner(id, requesterId);
+
+    if (
+      dto.availableFrom &&
+      dto.availableUntil &&
+      new Date(dto.availableFrom) >= new Date(dto.availableUntil)
+    ) {
+      throw new BadRequestException(
+        'availableFrom must be before availableUntil',
+      );
+    }
 
     return this.prisma.property.update({
       where: { id },

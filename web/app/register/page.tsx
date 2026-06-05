@@ -13,9 +13,11 @@ const RegisterPage = () => {
   const { register } = useAuth();
   const router = useRouter();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     const form = e.currentTarget;
     const name = (form.elements.namedItem("name") as HTMLInputElement).value;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
@@ -25,15 +27,18 @@ const RegisterPage = () => {
       form.elements.namedItem("confirmPassword") as HTMLInputElement
     ).value;
 
-    if (password !== confirmPassword) throw new Error("Password doesn't match");
+    if (password !== confirmPassword) {
+      setError("Passwords doesn't match");
+      return;
+    }
 
     try {
       await register(name, email, password);
       router.push("/dashboard");
-    } catch (error) {
-      console.error(error);
-
-      setError("Invalid credentials");
+    } catch {
+      setError("Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -42,9 +47,9 @@ const RegisterPage = () => {
       onSubmit={handleSubmit}
       title="Create your account"
       className="
-        mx-auto
+        m-auto
         flex
-        max-w-md
+        w-1/3
         flex-col
         gap-4
         rounded-2xl
@@ -75,7 +80,7 @@ const RegisterPage = () => {
       <FormField label="Password" htmlFor="password">
         <Input
           type="password"
-          placeholder="123"
+          placeholder="••••••••"
           name="password"
           id="password"
           required
@@ -85,23 +90,25 @@ const RegisterPage = () => {
       <FormField label="Confirm Password" htmlFor="confirmPassword">
         <Input
           type="password"
-          placeholder="123"
+          placeholder="••••••••"
           name="confirmPassword"
           id="confirmPassword"
           required
         />
       </FormField>
 
-      {error && <p>{error}</p>}
+      {error && <p className="text-sm text-red-500">{error}</p>}
 
       <p className="text-sm">
-        Already has an account?{" "}
+        Already have an account?{" "}
         <Link href="/login" className="hover:text-blue-500">
           Login
         </Link>
       </p>
 
-      <FormButton type="submit" disabled={false}>Register</FormButton>
+      <FormButton type="submit" disabled={loading}>
+        Register
+      </FormButton>
     </Form>
   );
 };

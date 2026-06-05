@@ -1,16 +1,20 @@
 import { Prisma } from '../../generated/prisma/client.js';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { UpdateUserDto } from './dto/users.dto.js';
 import * as bcrypt from 'bcrypt';
+import { BCRYPT_SALT_ROUNDS } from '../common/constants.js';
 
 @Injectable()
 export class UsersService {
-  private readonly SALT_ROUNDS = 10;
   constructor(private readonly prisma: PrismaService) {}
 
   async findOne(id: string) {
-    const user = this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id },
       select: { id: true, name: true, email: true },
     });
@@ -19,12 +23,30 @@ export class UsersService {
   }
 
   async update(id: string, dto: UpdateUserDto) {
-    await this.findOne(id);
+    if (dto.password !== undefined) {
+      if (!dto.currentPassword) {
+        throw new BadRequestException(
+          'currentPassword is required to change password',
+        );
+      }
+
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+        select: { password: true },
+      });
+
+      if (!user) throw new NotFoundException('User not found');
+
+      const matches = await bcrypt.compare(dto.currentPassword, user.password);
+
+      if (!matches)
+        throw new BadRequestException('Current password is incorrect');
+    }
 
     const data: Prisma.UserUpdateInput = {};
     if (dto.name !== undefined) data.name = dto.name;
     if (dto.password !== undefined)
-      data.password = await bcrypt.hash(dto.password, this.SALT_ROUNDS);
+      data.password = await bcrypt.hash(dto.password, BCRYPT_SALT_ROUNDS);
 
     return this.prisma.user.update({
       where: { id },

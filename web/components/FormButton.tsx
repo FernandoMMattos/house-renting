@@ -1,10 +1,11 @@
 interface ButtonProps {
   children: React.ReactNode;
-  type: "submit" | "reset" | "button" | undefined;
-  disabled: boolean
+  type?: "submit" | "reset" | "button";
+  disabled?: boolean;
+  className?: string
 }
 
-const FormButton = ({ children, type, ...props }: ButtonProps) => {
+const FormButton = ({ children, type = "button", className, ...props }: ButtonProps) => {
   return (
     <button
       className={`
@@ -18,6 +19,7 @@ const FormButton = ({ children, type, ...props }: ButtonProps) => {
         hover:cursor-pointer
         w-1/2
         place-self-center
+        ${className}
         `}
       {...props}
       type={type}

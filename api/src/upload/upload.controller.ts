@@ -16,7 +16,7 @@ import { UploadService } from './upload.service.js';
 import type {} from 'multer';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { UploadDto } from './dto/upload-photos.dto.js';
-import type { JwtUser } from '../common/types/jwt-user.decorator.js';
+import type { JwtUser } from '../common/types/jwt-user.types.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 
 @Controller('upload')
@@ -42,7 +42,7 @@ export class UploadController {
   )
   async uploadHousePhotos(
     @UploadedFiles() files: Express.Multer.File[],
-    @Body('propertyId') dto: UploadDto,
+    @Body() dto: UploadDto,
     @CurrentUser() user: JwtUser,
   ) {
     return this.uploadService.uploadImages(files, dto.propertyId, user.id);

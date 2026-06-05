@@ -1,16 +1,9 @@
-import {
-  Controller,
-  Get,
-  UseGuards,
-  Request,
-  Patch,
-  Body,
-} from '@nestjs/common';
+import { Controller, Get, UseGuards, Patch, Body } from '@nestjs/common';
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { UpdateUserDto } from './dto/users.dto.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
-import type { JwtUser } from '../common/types/jwt-user.decorator.js';
+import type { JwtUser } from '../common/types/jwt-user.types.js';
 
 @Controller('users')
 export class UsersController {

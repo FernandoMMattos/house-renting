@@ -1,16 +1,16 @@
-import { Property } from "@/types/property";
+import { PropertyCard as PropertyCardType } from "@/types/property";
 import Image from "next/image";
 import Link from "next/link";
 
 const FALLBACK_IMAGE = "https://placehold.co/222x150";
 
-const PropertyCard = ({ property }: { property: Property }) => {
-  const coverPhoto = property.image?.[0]?.url ?? FALLBACK_IMAGE;
+const PropertyCard = ({ property }: { property: PropertyCardType }) => {
+  const coverPhoto = property.images?.[0]?.url ?? FALLBACK_IMAGE;
 
   return (
     <Link
       href={`/properties/${property.id}`}
-      className="flex flex-col gap-2 hover:cursor-pointer"
+      className="flex flex-col gap-2"
     >
       <div className="relative h-37.5 w-55.5 overflow-hidden rounded-sm">
         <Image

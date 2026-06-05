@@ -11,12 +11,44 @@ export interface PropertyFormValues {
   roomType: string;
   bedrooms: string;
   bathrooms: string;
-  people: string;
+  sharingWith: string;
   price: string;
   availableFrom: string;
-  availableFor: string;
+  availableUntil: string;
   description: string;
 }
+
+export const EMPTY_PROPERTY_FORM: PropertyFormValues = {
+  street: "",
+  number: "",
+  areaCode: "",
+  eirCode: "",
+  propertyType: "HOUSE",
+  roomType: "SINGLE",
+  bedrooms: "",
+  bathrooms: "",
+  sharingWith: "",
+  price: "",
+  availableFrom: "",
+  availableUntil: "",
+  description: "",
+};
+
+export const formValuesToPayload = (values: PropertyFormValues) => ({
+  street: values.street,
+  number: Number(values.number),
+  areaCode: values.areaCode,
+  eirCode: values.eirCode,
+  propertyType: values.propertyType,
+  roomType: values.roomType,
+  bedrooms: Number(values.bedrooms),
+  bathrooms: Number(values.bathrooms),
+  sharingWith: Number(values.sharingWith),
+  price: Number(values.price),
+  availableFrom: new Date(values.availableFrom),
+  availableUntil: new Date(values.availableUntil),
+  description: values.description,
+});
 
 interface Props {
   values: PropertyFormValues;
@@ -66,6 +98,7 @@ const PropertyFormFields = ({ values, onChange }: Props) => {
           name="areaCode"
           type="number"
           placeholder="Ex: 9 for Dublin 9"
+          min={1}
           max={24}
           value={values.areaCode}
           onChange={field("areaCode")}
@@ -93,9 +126,10 @@ const PropertyFormFields = ({ values, onChange }: Props) => {
           onChange={field("propertyType")}
           required
         >
-          <option value="house">House</option>
-          <option value="flat">Flat</option>
-          <option value="apartment">Apartment</option>
+          <option value="HOUSE">House</option>
+          <option value="FLAT">Flat</option>
+          <option value="APARTMENT">Apartment</option>
+          <option value="STUDIO">Studio</option>
         </Select>
       </FormField>
 
@@ -107,9 +141,9 @@ const PropertyFormFields = ({ values, onChange }: Props) => {
           onChange={field("roomType")}
           required
         >
-          <option value="single">Single</option>
-          <option value="double">Double</option>
-          <option value="sharing">Sharing</option>
+          <option value="SINGLE">Single</option>
+          <option value="DOUBLE">Double</option>
+          <option value="SHARED">Sharing</option>
         </Select>
       </FormField>
 
@@ -123,6 +157,7 @@ const PropertyFormFields = ({ values, onChange }: Props) => {
           value={values.bedrooms}
           onChange={field("bedrooms")}
           required
+          placeholder="Use only number"
         />
       </FormField>
 
@@ -136,18 +171,20 @@ const PropertyFormFields = ({ values, onChange }: Props) => {
           value={values.bathrooms}
           onChange={field("bathrooms")}
           required
+          placeholder="Use only number"
         />
       </FormField>
 
-      <FormField label="People Sharing?" htmlFor="people">
+      <FormField label="People Sharing?" htmlFor="sharingWith">
         <Input
-          id="people"
-          name="people"
+          id="sharingWith"
+          name="sharingWith"
           type="number"
           max="20"
-          value={values.people}
-          onChange={field("people")}
+          value={values.sharingWith}
+          onChange={field("sharingWith")}
           required
+          placeholder="Use only number"
         />
       </FormField>
 
@@ -159,6 +196,7 @@ const PropertyFormFields = ({ values, onChange }: Props) => {
           value={values.price}
           onChange={field("price")}
           required
+          placeholder="Use only number"
         />
       </FormField>
 
@@ -174,13 +212,13 @@ const PropertyFormFields = ({ values, onChange }: Props) => {
         />
       </FormField>
 
-      <FormField label="Available Until" htmlFor="availableFor">
+      <FormField label="Available Until" htmlFor="availableUntil">
         <input
-          id="availableFor"
-          name="availableFor"
+          id="availableUntil"
+          name="availableUntil"
           type="date"
-          value={dateToInput(values.availableFor)}
-          onChange={field("availableFor")}
+          value={dateToInput(values.availableUntil)}
+          onChange={field("availableUntil")}
           className="w-full rounded-2xl border-2 border-gray-800 p-2 focus:outline-none cursor-pointer"
           required
         />

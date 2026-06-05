@@ -1,25 +1,24 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
 
-const AREA_CODES = Array.from({ length: 24 }, (_, i) => i + 1);
+const AREA_CODES = Array.from({ length: 24 }, (_, i) => String(i + 1));
 
 interface Props {
-  selected: number[];
-  onChange: (codes: number[]) => void;
+  selected: string[];
+  onChange: (codes: string[]) => void;
 }
 
 const AreaCodeFilter = ({ selected, onChange }: Props) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const toggle = (code: number) => {
+  const toggle = (code: string) => {
     const next = selected.includes(code)
       ? selected.filter((c) => c !== code)
       : [...selected, code];
     onChange(next);
   };
 
-  // Close on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -33,7 +32,7 @@ const AreaCodeFilter = ({ selected, onChange }: Props) => {
   const label =
     selected.length === 0
       ? "Any area"
-      : `Dublin ${selected.sort((a, b) => a - b).join(", ")}`;
+      : `Dublin ${selected.sort((a, b) => Number(a) - Number(b)).join(", ")}`;
 
   return (
     <div className="flex flex-col gap-1.5" ref={ref}>
@@ -41,11 +40,24 @@ const AreaCodeFilter = ({ selected, onChange }: Props) => {
         Area (Dublin)
       </label>
 
-      {/* Trigger */}
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 hover:border-gray-400 transition-colors"
+        className="
+          flex 
+          w-full 
+          items-center 
+          justify-between 
+          rounded-lg 
+          border 
+          border-gray-200 
+          bg-gray-50 
+          px-3 
+          py-2 
+          text-sm 
+          text-gray-800 
+          hover:border-gray-400 
+          transition-colors"
       >
         <span className="truncate">{label}</span>
         <svg
@@ -63,7 +75,6 @@ const AreaCodeFilter = ({ selected, onChange }: Props) => {
         </svg>
       </button>
 
-      {/* Dropdown */}
       {open && (
         <div className="rounded-lg border border-gray-200 bg-white shadow-md overflow-hidden">
           {/* Select all / Clear */}
@@ -86,7 +97,6 @@ const AreaCodeFilter = ({ selected, onChange }: Props) => {
             )}
           </div>
 
-          {/* Scrollable list */}
           <ul className="max-h-48 overflow-y-auto py-1">
             {AREA_CODES.map((code) => {
               const active = selected.includes(code);

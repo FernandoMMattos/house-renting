@@ -43,15 +43,18 @@ model Property {
   isActive       Boolean      @default(true)
   images         Image[]
   author         User         @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([authorId])
+  @@index([createdAt])
 }
 
 model Image {
   id         String   @id @default(cuid())
   url        String
-  publicId   String
+  publicId   String   @unique
   propertyId String
   createdAt  DateTime @default(now())
-  property   Property @relation(fields: [propertyId], references: [id])
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 }
 
 enum PropertyType {

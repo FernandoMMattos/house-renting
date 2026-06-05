@@ -17,7 +17,7 @@ const markerIcon = L.icon({
 interface PropertyMapProps {
   street: string;
   number: number;
-  areaCode: number;
+  areaCode: string;
 }
 
 const PropertyMap = ({ street, number, areaCode }: PropertyMapProps) => {
@@ -27,18 +27,24 @@ const PropertyMap = ({ street, number, areaCode }: PropertyMapProps) => {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const controller = new AbortController();
     const address = `${number} ${street}, Dublin ${areaCode}, Ireland`;
 
     fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`,
-      { headers: { "Accept-Language": "en" } },
+      { headers: { "Accept-Language": "en" }, signal: controller.signal },
     )
       .then((res) => res.json())
       .then((results) => {
         if (results.length === 0) throw new Error("Address not found");
         setCoords({ lat: Number(results[0].lat), lng: Number(results[0].lon) });
       })
-      .catch(() => setError("Could not load map for this address"));
+      .catch((err) => {
+        if (err.name === "AbortError") return;
+        setError("Could not load map for this address");
+      });
+
+    return () => controller.abort();
   }, [street, number, areaCode]);
 
   if (error) return <p className="text-gray-400 text-sm">{error}</p>;
