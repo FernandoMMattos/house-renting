@@ -52,10 +52,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const register = async (name: string, email: string, password: string) => {
-    const { user, token } = await apiRegister(name, email, password);
-    Cookies.set("token", token, COOKIE_OPTS);
-    Cookies.set("user", JSON.stringify(user), COOKIE_OPTS);
-    setUser(user);
+    await apiRegister(name, email, password);
+    // Registration no longer auto-logs in — user must verify email first
   };
 
   const logout = async () => {

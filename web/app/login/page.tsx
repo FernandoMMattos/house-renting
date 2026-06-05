@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Form from "@/components/Form";
 import Input from "@/components/Input";
@@ -12,22 +12,29 @@ import FormField from "@/components/FormField";
 const LoginPage = () => {
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const wasReset = searchParams.get("reset") === "1";
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
     const form = e.currentTarget;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-    const password = (form.elements.namedItem("password") as HTMLInputElement)
-      .value;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
 
     try {
       await login(email, password);
       router.push("/dashboard");
-    } catch {
-      setError("Invalid credentials");
+    } catch (err: any) {
+      const apiMessage = err.response?.data?.message;
+      if (apiMessage === "EMAIL_NOT_VERIFIED") {
+        setError("Please verify your email before logging in. Check your inbox.");
+      } else {
+        setError(err.userMessage || "Invalid credentials.");
+      }
     } finally {
       setLoading(false);
     }
@@ -49,6 +56,12 @@ const LoginPage = () => {
         w-1/3
       "
     >
+      {wasReset && (
+        <p className="text-sm text-green-600">
+          Password reset successfully. You can now log in.
+        </p>
+      )}
+
       <FormField label="Email" htmlFor="email">
         <Input
           type="email"
@@ -71,12 +84,19 @@ const LoginPage = () => {
 
       {error && <p className="text-sm text-red-500">{error}</p>}
 
-      <p className="text-sm">
-        Don't have an account?{" "}
-        <Link href="/register" className="hover:text-blue-500">
-          Register
-        </Link>
-      </p>
+      <div className="flex flex-col gap-1 text-sm">
+        <p>
+          Don't have an account?{" "}
+          <Link href="/register" className="hover:text-blue-500">
+            Register
+          </Link>
+        </p>
+        <p>
+          <Link href="/forgot-password" className="hover:text-blue-500">
+            Forgot your password?
+          </Link>
+        </p>
+      </div>
 
       <FormButton type="submit" disabled={loading}>
         Enter

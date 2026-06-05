@@ -94,8 +94,8 @@ const EditPropertyPage = () => {
             }`}
           >
             <span
-              className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-transform duration-300 ${
-                isActive ? "translate-x-0" : "-translate-x-5"
+              className={`absolute top-1 left-1 h-5 w-5 rounded-full bg-white shadow transition-transform duration-300 ${
+                isActive ? "translate-x-5" : "translate-x-0"
               }`}
             />
           </button>

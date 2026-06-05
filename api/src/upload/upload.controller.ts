@@ -19,6 +19,20 @@ import { UploadDto } from './dto/upload-photos.dto.js';
 import type { JwtUser } from '../common/types/jwt-user.types.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 
+// Validate actual file bytes, not just the MIME header (which can be spoofed)
+function isAllowedImageBuffer(buf: Buffer): boolean {
+  if (buf.length < 12) return false;
+  const isJpeg = buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
+  const isPng =
+    buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47 &&
+    buf[4] === 0x0d && buf[5] === 0x0a && buf[6] === 0x1a && buf[7] === 0x0a;
+  const isGif = buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x38;
+  const isWebp =
+    buf[0] === 0x52 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x46 &&
+    buf[8] === 0x57 && buf[9] === 0x45 && buf[10] === 0x42 && buf[11] === 0x50;
+  return isJpeg || isPng || isGif || isWebp;
+}
+
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
@@ -45,6 +59,11 @@ export class UploadController {
     @Body() dto: UploadDto,
     @CurrentUser() user: JwtUser,
   ) {
+    for (const file of files) {
+      if (!isAllowedImageBuffer(file.buffer)) {
+        throw new BadRequestException(`File "${file.originalname}" is not a valid image`);
+      }
+    }
     return this.uploadService.uploadImages(files, dto.propertyId, user.id);
   }
 

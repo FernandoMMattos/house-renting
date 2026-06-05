@@ -14,12 +14,16 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      Cookies.remove('token')
-      Cookies.remove('user')
-      window.location.href = "/login"
+    const status = error.response?.status;
+    if (status === 401) {
+      Cookies.remove('token');
+      Cookies.remove('user');
+      window.location.href = '/login';
     }
-    return Promise.reject(error)
+    if (status === 429) {
+      error.userMessage = 'Too many requests. Please wait a moment and try again.';
+    }
+    return Promise.reject(error);
   }
 )
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Form from "@/components/Form";
 import Input from "@/components/Input";
@@ -11,36 +10,55 @@ import FormField from "@/components/FormField";
 
 const RegisterPage = () => {
   const { register } = useAuth();
-  const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
     const form = e.currentTarget;
     const name = (form.elements.namedItem("name") as HTMLInputElement).value;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-    const password = (form.elements.namedItem("password") as HTMLInputElement)
-    .value;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
     const confirmPassword = (
       form.elements.namedItem("confirmPassword") as HTMLInputElement
     ).value;
-    
+
     if (password !== confirmPassword) {
-      setError("Passwords doesn't match");
-      return;
+      setError("Passwords don't match.");
+      return; // loading never started, so no need to reset it
     }
 
+    setLoading(true);
     try {
-      setLoading(true);
       await register(name, email, password);
-      router.push("/dashboard");
-    } catch {
-      setError("Registration failed. Please try again.");
+      setDone(true);
+    } catch (err: any) {
+      setError(
+        err.userMessage ||
+          err.response?.data?.message ||
+          "Registration failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  if (done) {
+    return (
+      <div className="m-auto flex w-1/3 flex-col items-center gap-4 rounded-2xl border p-8 text-center">
+        <h1 className="text-2xl font-semibold">Check your inbox</h1>
+        <p className="text-sm text-gray-600">
+          We've sent a verification link to your email address. Click it to
+          activate your account, then log in.
+        </p>
+        <Link href="/login" className="text-sm hover:text-blue-500">
+          Go to Login
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <Form

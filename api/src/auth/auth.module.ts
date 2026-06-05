@@ -7,11 +7,13 @@ import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JWT_EXPIRES_IN } from '../common/constants.js';
+import { EmailModule } from '../email/email.module.js';
 
 @Module({
   imports: [
     PrismaModule,
     PassportModule,
+    EmailModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
