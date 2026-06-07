@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { apiVerifyEmail } from "@/lib/auth";
 import Link from "next/link";
 
-const VerifyEmailPage = () => {
+const VerifyEmailContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token");
@@ -59,5 +59,11 @@ const VerifyEmailPage = () => {
     </div>
   );
 };
+
+const VerifyEmailPage = () => (
+  <Suspense>
+    <VerifyEmailContent />
+  </Suspense>
+);
 
 export default VerifyEmailPage;

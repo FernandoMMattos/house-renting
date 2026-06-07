@@ -48,7 +48,10 @@ export class AuthService {
 
     await this.emailService.sendVerificationEmail(user.email, token);
 
-    return { message: 'Registration successful. Please check your email to verify your account.' };
+    return {
+      message:
+        'Registration successful. Please check your email to verify your account.',
+    };
   }
 
   async login(dto: LoginDto) {
@@ -96,7 +99,9 @@ export class AuthService {
       return { message: 'If that email exists, a reset link has been sent.' };
     }
 
-    await this.prisma.passwordResetToken.deleteMany({ where: { userId: user.id } });
+    await this.prisma.passwordResetToken.deleteMany({
+      where: { userId: user.id },
+    });
 
     const token = crypto.randomBytes(32).toString('hex');
     await this.prisma.passwordResetToken.create({

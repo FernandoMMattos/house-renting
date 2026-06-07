@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Form from "@/components/Form";
 import Input from "@/components/Input";
@@ -9,7 +9,7 @@ import FormField from "@/components/FormField";
 import Link from "next/link";
 import { apiResetPassword } from "@/lib/auth";
 
-const ResetPasswordPage = () => {
+const ResetPasswordContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token");
@@ -97,5 +97,11 @@ const ResetPasswordPage = () => {
     </Form>
   );
 };
+
+const ResetPasswordPage = () => (
+  <Suspense>
+    <ResetPasswordContent />
+  </Suspense>
+);
 
 export default ResetPasswordPage;

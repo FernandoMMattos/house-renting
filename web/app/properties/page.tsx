@@ -7,7 +7,9 @@ import { getProperties } from "@/lib/property";
 import { Property } from "@/types/property";
 import { useEffect, useState } from "react";
 
-const PropertiesPage = () => {
+import { Suspense } from "react";
+
+const PropertiesContent = () => {
   const { filters, handleChange, handleClear } = usePropertyFilters();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(false);
@@ -52,5 +54,11 @@ const PropertiesPage = () => {
     </>
   );
 };
+
+const PropertiesPage = () => (
+  <Suspense>
+    <PropertiesContent />
+  </Suspense>
+);
 
 export default PropertiesPage;

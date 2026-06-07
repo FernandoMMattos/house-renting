@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Form from "@/components/Form";
 import Input from "@/components/Input";
 import FormButton from "@/components/FormButton";
@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import FormField from "@/components/FormField";
 
-const LoginPage = () => {
+const LoginForm = () => {
   const { login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -104,5 +104,11 @@ const LoginPage = () => {
     </Form>
   );
 };
+
+const LoginPage = () => (
+  <Suspense>
+    <LoginForm />
+  </Suspense>
+);
 
 export default LoginPage;
