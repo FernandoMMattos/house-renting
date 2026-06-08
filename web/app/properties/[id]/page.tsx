@@ -3,12 +3,8 @@ import Header from "@/components/Header";
 import PropertyGallery from "@/components/PropertyGallery";
 import { getPropertyServer } from "@/lib/property";
 import { notFound } from "next/navigation";
-import dynamic from "next/dynamic";
 import type { Metadata } from "next";
-
-const PropertyMap = dynamic(() => import("@/components/PropertyMap"), {
-  ssr: false,
-});
+import PropertyMap from "@/components/PropertyMapLazy";
 
 const FALLBACK = "https://placehold.co/800x500";
 
