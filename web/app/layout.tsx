@@ -29,10 +29,14 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col min-w-full pb-16 md:pb-0">
+      <body className="min-h-full min-w-full">
         <AuthProvider>
-          {children}
-          <BottomNav />
+          <div className="flex flex-col h-dvh md:h-auto">
+            <div className="flex-1 min-h-0 overflow-y-auto md:overflow-visible">
+              {children}
+            </div>
+            <BottomNav />
+          </div>
         </AuthProvider>
       </body>
     </html>

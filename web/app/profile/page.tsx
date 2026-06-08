@@ -63,7 +63,7 @@ const ProfilePage = () => {
   if (!user) return null;
 
   return (
-    <div className="flex min-h-screen justify-center py-10 px-4 pb-24 md:pb-10">
+    <div className="flex min-h-screen justify-center py-10 px-4">
       <div className="w-full max-w-5xl flex flex-col gap-10">
         <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between">

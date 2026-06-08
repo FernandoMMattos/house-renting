@@ -17,7 +17,7 @@ const BottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 flex md:hidden">
+    <nav className="shrink-0 bg-white border-t border-gray-200 flex md:hidden">
       {navItems.map(({ href, icon: Icon, label }) => {
         const active = pathname === href || (href === "/properties" && pathname.startsWith("/properties"));
         return (
