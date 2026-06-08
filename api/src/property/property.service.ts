@@ -86,7 +86,7 @@ export class PropertyService {
 
   async findByAuthor(id: string) {
     return this.prisma.property.findMany({
-      where: { authorId: id, isActive: true },
+      where: { authorId: id },
       orderBy: { createdAt: 'desc' },
       include: { images: true },
     });
