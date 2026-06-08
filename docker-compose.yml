@@ -11,7 +11,7 @@ services:
     build:
       context: ./web
       args:
-        NEXT_PUBLIC_API_URL: https://api.houserentingdublin.xyz
+        NEXT_PUBLIC_API_URL: https://api.houserentingdublin.xyz/api
     container_name: web
     ports:
       - "3000:3000"
