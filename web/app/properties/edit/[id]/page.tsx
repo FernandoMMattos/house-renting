@@ -7,7 +7,7 @@ import PropertyFormFields, {
   formValuesToPayload,
   PropertyFormValues,
 } from "@/components/PropertyFormFields";
-import { getProperty, updateProperty } from "@/lib/property";
+import { deleteProperty, getProperty, updateProperty } from "@/lib/property";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -19,6 +19,8 @@ const EditPropertyPage = () => {
   const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -66,6 +68,20 @@ const EditPropertyPage = () => {
     }
   };
 
+  const handleDelete = async () => {
+    setError("");
+    try {
+      setDeleting(true);
+      await deleteProperty(id as string);
+      router.push("/profile");
+    } catch {
+      setError("Failed to delete property. Please try again.");
+      setShowDeleteModal(false);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) return <p className="mx-20 my-10 text-gray-400">Loading...</p>;
 
   return (
@@ -109,8 +125,52 @@ const EditPropertyPage = () => {
               {saving ? "Saving..." : "Save changes"}
             </FormButton>
           </div>
+
+          <div className="md:col-span-2 flex justify-center pt-2">
+            <button
+              type="button"
+              onClick={() => setShowDeleteModal(true)}
+              className="rounded-xl bg-red-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors cursor-pointer"
+            >
+              Delete property
+            </button>
+          </div>
         </section>
       </Form>
+
+      {showDeleteModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={() => setShowDeleteModal(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-lg font-semibold text-gray-900">Delete property?</h2>
+            <p className="mt-2 text-sm text-gray-500">
+              This action cannot be undone. The listing will be permanently removed.
+            </p>
+            <div className="mt-6 flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60 transition-colors cursor-pointer"
+              >
+                {deleting ? "Deleting..." : "Confirm delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

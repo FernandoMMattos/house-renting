@@ -23,6 +23,11 @@ export const updateProperty = async (id: string, data: UpdatePropertyData) => {
   return response;
 };
 
+export const deleteProperty = async (id: string) => {
+  const { data: response } = await api.delete(`/properties/${id}`);
+  return response;
+};
+
 export const getMyProperties = async () => {
   const { data } = await api.get("/properties/me");
   return data;

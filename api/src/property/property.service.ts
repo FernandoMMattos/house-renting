@@ -121,10 +121,7 @@ export class PropertyService {
 
   async delete(requesterId: string, id: string) {
     await this.findPropertyAndVerifyOwner(id, requesterId);
-    return this.prisma.property.update({
-      where: { id },
-      data: { isActive: false },
-    });
+    return this.prisma.property.delete({ where: { id } });
   }
 
   private async findPropertyAndVerifyOwner(id: string, requesterId: string) {
