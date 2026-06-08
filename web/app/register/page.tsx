@@ -27,7 +27,7 @@ const RegisterPage = () => {
 
     if (password !== confirmPassword) {
       setError("Passwords don't match.");
-      return; // loading never started, so no need to reset it
+      return;
     }
 
     setLoading(true);
@@ -47,87 +47,82 @@ const RegisterPage = () => {
 
   if (done) {
     return (
-      <div className="m-auto flex w-1/3 flex-col items-center gap-4 rounded-2xl border p-8 text-center">
-        <h1 className="text-2xl font-semibold">Check your inbox</h1>
-        <p className="text-sm text-gray-600">
-          We've sent a verification link to your email address. Click it to
-          activate your account, then log in.
-        </p>
-        <Link href="/login" className="text-sm hover:text-blue-500">
-          Go to Login
-        </Link>
+      <div className="flex-1 flex items-center justify-center px-4 py-10">
+        <div className="flex w-full max-w-sm flex-col items-center gap-4 rounded-2xl border p-6 md:p-8 text-center">
+          <h1 className="text-2xl font-semibold">Check your inbox</h1>
+          <p className="text-sm text-gray-600">
+            We&apos;ve sent a verification link to your email address. Click it to
+            activate your account, then log in.
+          </p>
+          <Link href="/login" className="text-sm hover:text-blue-500">
+            Go to Login
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <Form
-      onSubmit={handleSubmit}
-      title="Create your account"
-      className="
-        m-auto
-        flex
-        w-1/3
-        flex-col
-        gap-4
-        rounded-2xl
-        border
-        p-8
-        text-center"
-    >
-      <FormField label="Name" htmlFor="name">
-        <Input
-          type="text"
-          id="name"
-          name="name"
-          placeholder="John Doe"
-          required
-        />
-      </FormField>
+    <div className="flex-1 flex items-center justify-center px-4 py-10">
+      <Form
+        onSubmit={handleSubmit}
+        title="Create your account"
+        className="flex flex-col gap-4 rounded-2xl border p-6 md:p-8 text-center w-full max-w-sm"
+      >
+        <FormField label="Name" htmlFor="name">
+          <Input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="John Doe"
+            required
+          />
+        </FormField>
 
-      <FormField label="Email" htmlFor="email">
-        <Input
-          type="email"
-          placeholder="johndoe@domain.com"
-          name="email"
-          id="email"
-          required
-        />
-      </FormField>
+        <FormField label="Email" htmlFor="email">
+          <Input
+            type="email"
+            placeholder="johndoe@domain.com"
+            name="email"
+            id="email"
+            required
+          />
+        </FormField>
 
-      <FormField label="Password" htmlFor="password">
-        <Input
-          type="password"
-          placeholder="••••••••"
-          name="password"
-          id="password"
-          required
-        />
-      </FormField>
+        <FormField label="Password" htmlFor="password">
+          <Input
+            type="password"
+            placeholder="••••••••"
+            name="password"
+            id="password"
+            required
+          />
+        </FormField>
 
-      <FormField label="Confirm Password" htmlFor="confirmPassword">
-        <Input
-          type="password"
-          placeholder="••••••••"
-          name="confirmPassword"
-          id="confirmPassword"
-          required
-        />
-      </FormField>
+        <FormField label="Confirm Password" htmlFor="confirmPassword">
+          <Input
+            type="password"
+            placeholder="••••••••"
+            name="confirmPassword"
+            id="confirmPassword"
+            required
+          />
+        </FormField>
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-red-500">{error}</p>}
 
-      <p className="text-sm">
-        Already have an account?{" "}
-        <Link href="/login" className="hover:text-blue-500">
-          Login
-        </Link>
-      </p>
+        <p className="text-sm">
+          Already have an account?{" "}
+          <Link href="/login" className="hover:text-blue-500">
+            Login
+          </Link>
+        </p>
 
-      <FormButton type="submit" disabled={loading}>
-        Register
-      </FormButton>
-    </Form>
+        <FormButton type="submit" disabled={loading}>
+          Register
+        </FormButton>
+      </Form>
+    </div>
   );
 };
 

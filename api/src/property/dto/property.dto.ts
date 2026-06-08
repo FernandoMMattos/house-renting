@@ -2,12 +2,12 @@ import {
   IsDateString,
   IsInt,
   IsString,
+  IsNumber,
   Min,
   Length,
   MaxLength,
   IsNotEmpty,
   IsEnum,
-  IsDecimal,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PropertyType, RoomType } from '../../../generated/prisma/enums.js';
@@ -75,7 +75,7 @@ export class PropertyDto {
 
   @ApiProperty()
   @Type(() => Number)
+  @IsNumber()
   @Min(0)
-  @IsDecimal()
   price: number;
 }

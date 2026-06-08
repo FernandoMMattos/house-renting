@@ -41,67 +41,59 @@ const LoginForm = () => {
   };
 
   return (
-    <Form
-      onSubmit={handleSubmit}
-      title="Welcome!"
-      className="
-        flex
-        flex-col
-        gap-4
-        rounded-2xl
-        border
-        p-8
-        text-center
-        m-auto
-        w-1/3
-      "
-    >
-      {wasReset && (
-        <p className="text-sm text-green-600">
-          Password reset successfully. You can now log in.
-        </p>
-      )}
+    <div className="flex-1 flex items-center justify-center px-4 py-10">
+      <Form
+        onSubmit={handleSubmit}
+        title="Welcome!"
+        className="flex flex-col gap-4 rounded-2xl border p-6 md:p-8 text-center w-full max-w-sm"
+      >
+        {wasReset && (
+          <p className="text-sm text-green-600">
+            Password reset successfully. You can now log in.
+          </p>
+        )}
 
-      <FormField label="Email" htmlFor="email">
-        <Input
-          type="email"
-          id="email"
-          name="email"
-          placeholder="johndoe@domain.com"
-          required
-        />
-      </FormField>
+        <FormField label="Email" htmlFor="email">
+          <Input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="johndoe@domain.com"
+            required
+          />
+        </FormField>
 
-      <FormField label="Password" htmlFor="password">
-        <Input
-          type="password"
-          id="password"
-          name="password"
-          required
-          minLength={5}
-        />
-      </FormField>
+        <FormField label="Password" htmlFor="password">
+          <Input
+            type="password"
+            id="password"
+            name="password"
+            required
+            minLength={5}
+          />
+        </FormField>
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-red-500">{error}</p>}
 
-      <div className="flex flex-col gap-1 text-sm">
-        <p>
-          Don't have an account?{" "}
-          <Link href="/register" className="hover:text-blue-500">
-            Register
-          </Link>
-        </p>
-        <p>
-          <Link href="/forgot-password" className="hover:text-blue-500">
-            Forgot your password?
-          </Link>
-        </p>
-      </div>
+        <div className="flex flex-col gap-1 text-sm">
+          <p>
+            Don&apos;t have an account?{" "}
+            <Link href="/register" className="hover:text-blue-500">
+              Register
+            </Link>
+          </p>
+          <p>
+            <Link href="/forgot-password" className="hover:text-blue-500">
+              Forgot your password?
+            </Link>
+          </p>
+        </div>
 
-      <FormButton type="submit" disabled={loading}>
-        Enter
-      </FormButton>
-    </Form>
+        <FormButton type="submit" disabled={loading}>
+          Enter
+        </FormButton>
+      </Form>
+    </div>
   );
 };
 

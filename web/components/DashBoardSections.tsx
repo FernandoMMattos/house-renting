@@ -22,14 +22,14 @@ const DashBoardSections = () => {
   };
 
   return (
-    <section className="mx-20 flex flex-col">
-      <span className="font-bold text-2xl my-10">Browse by filters</span>
-      <div className="mb-10 flex gap-4">
+    <section className="mx-4 md:mx-20 flex flex-col">
+      <span className="font-bold text-xl md:text-2xl my-6 md:my-10">Browse by category</span>
+      <div className="mb-6 md:mb-10 flex gap-3 overflow-x-auto pb-2">
         {FILTERS_OPTIONS.map((filter) => (
           <Button
             key={filter.value}
             onClick={() => handleFilter(filter)}
-            className="flex-1"
+            className="shrink-0 text-sm"
           >
             {filter.label}
           </Button>

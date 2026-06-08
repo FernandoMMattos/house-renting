@@ -66,16 +66,16 @@ const ProfilePage = () => {
     <div className="flex min-h-screen justify-center py-10 px-4">
       <div className="w-full max-w-5xl flex flex-col gap-10">
         <section className="flex flex-col gap-4">
-          <div className="relative md:col-span-2 place-self-end">
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold">My Profile</h1>
             <button
               type="button"
               onClick={() => router.back()}
-              className="absolute cursor-pointer mt-3 text-sm text-gray-500 hover:text-gray-800"
+              className="cursor-pointer text-sm text-gray-500 hover:text-gray-800"
             >
               ← Back
             </button>
           </div>
-          <h1 className="text-3xl font-bold">My Profile</h1>
 
           <form
             onSubmit={handleSubmit}

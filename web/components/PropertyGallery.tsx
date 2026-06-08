@@ -41,7 +41,51 @@ const PropertyGallery = ({ photos, number, street }: PropertyGalleryProps) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="grid grid-cols-4 grid-rows-2 gap-2 h-120 rounded-xl overflow-hidden">
+      {/* Mobile: snap-scroll carousel */}
+      <div className="md:hidden relative">
+        <div
+          className="flex overflow-x-auto snap-x snap-mandatory rounded-xl gap-2 no-scrollbar"
+          style={{ scrollBehavior: "smooth" }}
+        >
+          {photos.map((photo, i) => (
+            <button
+              key={photo.publicId || i}
+              type="button"
+              className="relative shrink-0 w-full aspect-4/3 rounded-xl overflow-hidden"
+              onClick={() => {
+                setActiveIndex(i);
+                setLightboxOpen(true);
+              }}
+            >
+              <Image
+                src={photo.url}
+                alt={`${number} ${street} — photo ${i + 1}`}
+                fill
+                priority={i === 0}
+                sizes="100vw"
+                quality={90}
+                style={{ objectFit: "cover" }}
+                loading={i === 0 ? "eager" : "lazy"}
+              />
+            </button>
+          ))}
+        </div>
+        {photos.length > 1 && (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {photos.map((_, i) => (
+              <span
+                key={i}
+                className={`block h-1.5 rounded-full transition-all ${
+                  i === activeIndex ? "w-4 bg-white" : "w-1.5 bg-white/50"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop: original grid */}
+      <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-2 h-120 rounded-xl overflow-hidden">
         <button
           type="button"
           className="relative col-span-2 row-span-2 w-full h-full"
@@ -99,7 +143,7 @@ const PropertyGallery = ({ photos, number, street }: PropertyGalleryProps) => {
             setActiveIndex(0);
             setLightboxOpen(true);
           }}
-          className="self-end text-sm underline text-gray-600 hover:text-gray-900"
+          className="hidden md:block self-end text-sm underline text-gray-600 hover:text-gray-900"
         >
           See all {photos.length} photos
         </button>

@@ -1,4 +1,4 @@
-import { CreatePropertyData, UpdatePropertyData } from "@/types/property";
+import { CreatePropertyData, Property, UpdatePropertyData } from "@/types/property";
 import api from "./api";
 import { EMPTY_FILTERS, PropertyFilters } from "@/types/filters";
 
@@ -34,3 +34,35 @@ export const filtersToParams = (filters: Partial<PropertyFilters>) =>
       .filter(([, v]) => (Array.isArray(v) ? v.length > 0 : v !== ""))
       .map(([k, v]) => [k, Array.isArray(v) ? v.join(",") : v]),
   );
+
+export const searchParamsToFilters = (
+  params: Record<string, string | string[] | undefined>,
+): PropertyFilters => ({
+  areaCodes:
+    typeof params.areaCodes === "string"
+      ? params.areaCodes.split(",").filter(Boolean)
+      : [],
+  roomType: (params.roomType as string) ?? "",
+  propertyType: (params.propertyType as string) ?? "",
+  minPrice: (params.minPrice as string) ?? "",
+  maxPrice: (params.maxPrice as string) ?? "",
+  bedrooms: (params.bedrooms as string) ?? "",
+  bathrooms: (params.bathrooms as string) ?? "",
+  sharingWith: (params.sharingWith as string) ?? "",
+});
+
+export const getPropertiesServer = async (
+  filters?: Partial<PropertyFilters>,
+): Promise<Property[]> => {
+  const params = filtersToParams(filters ?? EMPTY_FILTERS);
+  const query = new URLSearchParams(params as Record<string, string>).toString();
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api";
+  const res = await fetch(
+    `${baseUrl}/properties${query ? `?${query}` : ""}`,
+    { cache: "no-store" },
+  );
+  if (!res.ok) return [];
+  const json = await res.json();
+  return (json.data ?? []) as Property[];
+};

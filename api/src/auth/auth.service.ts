@@ -31,22 +31,33 @@ export class AuthService {
     if (exists) throw new ConflictException('Email already in use');
 
     const hashedPassword = await bcrypt.hash(dto.password, BCRYPT_SALT_ROUNDS);
-
-    const user = await this.prisma.user.create({
-      data: { email: dto.email, name: dto.name, password: hashedPassword },
-      select: { id: true, email: true, name: true },
-    });
-
     const token = crypto.randomBytes(32).toString('hex');
-    await this.prisma.verificationToken.create({
-      data: {
-        token,
-        userId: user.id,
-        expiresAt: new Date(Date.now() + VERIFICATION_TOKEN_TTL_MS),
-      },
+    const expiresAt = new Date(Date.now() + VERIFICATION_TOKEN_TTL_MS);
+
+    const user = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.user.create({
+        data: { email: dto.email, name: dto.name, password: hashedPassword },
+        select: { id: true, email: true, name: true },
+      });
+
+      await tx.verificationToken.create({
+        data: { token, userId: created.id, expiresAt },
+      });
+
+      return created;
     });
 
-    await this.emailService.sendVerificationEmail(user.email, token);
+    try {
+      await this.emailService.sendVerificationEmail(user.email, token);
+    } catch (err) {
+      await this.prisma.$transaction([
+        this.prisma.verificationToken.deleteMany({
+          where: { userId: user.id },
+        }),
+        this.prisma.user.delete({ where: { id: user.id } }),
+      ]);
+      throw err;
+    }
 
     return {
       message:

@@ -50,7 +50,7 @@ export class PropertyService {
         },
       }),
     };
-    const [data, total] = await this.prisma.$transaction([
+    const [data, total] = await Promise.all([
       this.prisma.property.findMany({
         where,
         orderBy: { createdAt: 'desc' },

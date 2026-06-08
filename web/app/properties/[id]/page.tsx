@@ -34,12 +34,12 @@ const PropertyPage = () => {
     ? property.images
     : [{ url: FALLBACK, publicId: "" }];
 
-  if (loading) return <p className="mx-20 my-10 text-gray-400">Loading...</p>;
+  if (loading) return <p className="mx-4 md:mx-20 my-10 text-gray-400">Loading...</p>;
   if (error)
     return (
       <>
         <Header />
-        <p className="mx-20 my-10 text-red-500">{error}</p>
+        <p className="mx-4 md:mx-20 my-10 text-red-500">{error}</p>
         <Footer />
       </>
     );
@@ -48,7 +48,7 @@ const PropertyPage = () => {
   return (
     <>
       <Header />
-      <main className="mx-20 my-10 flex flex-col gap-6">
+      <main className="mx-4 md:mx-20 my-6 md:my-10 flex flex-col gap-6 pb-20 md:pb-0">
         <PropertyGallery
           photos={photos}
           number={property.number}
