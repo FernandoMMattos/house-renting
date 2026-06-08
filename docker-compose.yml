@@ -1,0 +1,20 @@
+services:
+  api:
+    build: ./api
+    container_name: api
+    env_file: ./api/.env
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./web
+      args:
+        NEXT_PUBLIC_API_URL: https://api.houserentingdublin.xyz
+    container_name: web
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - api
