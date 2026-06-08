@@ -15,6 +15,7 @@ export class RegisterDto {
   name: string;
 
   @IsEmail()
+  @Transform(({ value }) => value?.toLowerCase()?.trim())
   email: string;
 
   @IsString()
@@ -25,6 +26,7 @@ export class RegisterDto {
 
 export class LoginDto {
   @IsEmail()
+  @Transform(({ value }) => value?.toLowerCase()?.trim())
   email: string;
 
   @IsString()

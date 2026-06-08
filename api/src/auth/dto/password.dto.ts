@@ -1,7 +1,9 @@
+import { Transform } from 'class-transformer';
 import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class ForgotPasswordDto {
   @IsEmail()
+  @Transform(({ value }) => value?.toLowerCase()?.trim())
   email: string;
 }
 
