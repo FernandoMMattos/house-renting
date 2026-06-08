@@ -111,7 +111,7 @@ const PropertyFormFields = ({ values, onChange }: Props) => {
           id="eirCode"
           name="eirCode"
           placeholder="Ex: D01LM87"
-          pattern="^D\d{2}\s?[A-Z0-9]{4}$"
+          pattern="^[Dd]\d{2}[A-Za-z0-9]{4}$"
           value={values.eirCode}
           onChange={field("eirCode")}
           required

@@ -1,14 +1,10 @@
-"use client";
-
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import PropertyGallery from "@/components/PropertyGallery";
-import { getProperty } from "@/lib/property";
-import { Property } from "@/types/property";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { getPropertyServer } from "@/lib/property";
+import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
-import { useAuth } from "@/context/AuthContext";
+import type { Metadata } from "next";
 
 const PropertyMap = dynamic(() => import("@/components/PropertyMap"), {
   ssr: false,
@@ -16,34 +12,29 @@ const PropertyMap = dynamic(() => import("@/components/PropertyMap"), {
 
 const FALLBACK = "https://placehold.co/800x500";
 
-const PropertyPage = () => {
-  const { id } = useParams();
-  const { user } = useAuth()
-  const [property, setProperty] = useState<Property | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
 
-  useEffect(() => {
-    getProperty(id as string)
-      .then(setProperty)
-      .catch(() => setError("Failed to load property"))
-      .finally(() => setLoading(false));
-  }, [id]);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const property = await getPropertyServer(id).catch(() => null);
+  if (!property) return { title: "Property not found" };
+  return {
+    title: `${property.number} ${property.street} — Dublin ${property.areaCode} | House Renting Dublin`,
+    description: property.description.slice(0, 160),
+  };
+}
 
-  const photos = property?.images?.length
+const PropertyPage = async ({ params }: PageProps) => {
+  const { id } = await params;
+  const property = await getPropertyServer(id).catch(() => null);
+
+  if (!property) notFound();
+
+  const photos = property.images?.length
     ? property.images
     : [{ url: FALLBACK, publicId: "" }];
-
-  if (loading) return <p className="mx-4 md:mx-20 my-10 text-gray-400">Loading...</p>;
-  if (error)
-    return (
-      <>
-        <Header />
-        <p className="mx-4 md:mx-20 my-10 text-red-500">{error}</p>
-        <Footer />
-      </>
-    );
-  if (!property) return null;
 
   return (
     <>
@@ -107,7 +98,7 @@ const PropertyPage = () => {
         <section className="flex flex-col gap-2">
           <h2 className="text-xl font-semibold">Listed by</h2>
           <p>{property.author.name}</p>
-          {user && <p className="text-gray-500">{property.author.email}</p>}
+          <p className="text-gray-500">{property.author.email}</p>
         </section>
       </main>
       <Footer />

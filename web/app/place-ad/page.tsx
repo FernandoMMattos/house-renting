@@ -70,10 +70,7 @@ const PlaceAd = () => {
       }
 
       router.push("/dashboard");
-    } catch (err) {
-      const e = err as { response?: { status?: number; data?: unknown } };
-      console.error("Status:", e.response?.status);
-      console.error("Validation errors:", e.response?.data);
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setUploading(false);

@@ -51,18 +51,27 @@ export const searchParamsToFilters = (
   sharingWith: (params.sharingWith as string) ?? "",
 });
 
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api";
+
 export const getPropertiesServer = async (
   filters?: Partial<PropertyFilters>,
 ): Promise<Property[]> => {
   const params = filtersToParams(filters ?? EMPTY_FILTERS);
   const query = new URLSearchParams(params as Record<string, string>).toString();
-  const baseUrl =
-    process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api";
   const res = await fetch(
-    `${baseUrl}/properties${query ? `?${query}` : ""}`,
+    `${API_BASE}/properties${query ? `?${query}` : ""}`,
     { cache: "no-store" },
   );
   if (!res.ok) return [];
   const json = await res.json();
   return (json.data ?? []) as Property[];
+};
+
+export const getPropertyServer = async (id: string): Promise<Property> => {
+  const res = await fetch(`${API_BASE}/properties/${id}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Property not found");
+  return res.json();
 };
