@@ -143,6 +143,13 @@ const ProfilePage = () => {
             <FormButton type="submit" disabled={saving}>
               {saving ? "Saving..." : "Save changes"}
             </FormButton>
+            <button
+              type="button"
+              onClick={() => logout()}
+              className="self-start text-sm text-red-500 underline hover:cursor-pointer"
+            >
+              Log out
+            </button>
           </form>
         </section>
 
@@ -183,14 +190,6 @@ const ProfilePage = () => {
             </div>
           )}
         </section>
-
-        <button
-          type="button"
-          onClick={() => logout()}
-          className="self-start text-sm text-red-500 underline hover:cursor-pointer"
-        >
-          Log out
-        </button>
       </div>
     </div>
   );
